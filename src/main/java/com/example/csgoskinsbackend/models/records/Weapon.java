@@ -1,4 +1,4 @@
-package models.records;
+package com.example.csgoskinsbackend.models.records;
 
 import jakarta.persistence.*;
 

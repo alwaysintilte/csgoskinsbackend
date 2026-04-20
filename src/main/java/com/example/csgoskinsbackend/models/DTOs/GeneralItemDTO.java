@@ -1,30 +1,20 @@
-package models.records;
+package com.example.csgoskinsbackend.models.DTOs;
 
-import jakarta.persistence.*;
+import java.util.List;
 
-public class GeneralItem {
-    private Integer id;
+public class GeneralItemDTO {
     private String name;
     private String description;
     private String type;
     private String image;
 
-    public GeneralItem() {}
+    public GeneralItemDTO() {}
 
-    public GeneralItem(Integer id, String name, String description, String type, String image) {
-        this.id = id;
+    public GeneralItemDTO(String name, String description, String type, String image) {
         this.name = name;
         this.description = description;
         this.type = type;
         this.image = image;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -57,5 +47,15 @@ public class GeneralItem {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "WeaponDTO{" +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", image='" + type + '\'' +
+                ", image='" + image + '\'' +
+                '}';
     }
 }

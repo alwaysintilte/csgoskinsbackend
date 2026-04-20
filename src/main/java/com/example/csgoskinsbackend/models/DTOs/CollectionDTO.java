@@ -1,21 +1,19 @@
-package models.records;
-
-import jakarta.persistence.*;
+package com.example.csgoskinsbackend.models.DTOs;
 
 import java.time.LocalDate;
 
-public class Collection {
+public class CollectionDTO {
     private Integer id;
     private String name;
-    private String imageUrl;
+    private String image;
     private LocalDate dateAdded;
 
-    public Collection() {}
+    public CollectionDTO() {}
 
-    public Collection(Integer id, String name, String imageUrl, LocalDate dateAdded) {
+    public CollectionDTO(Integer id, String name, String image, LocalDate dateAdded) {
         this.id = id;
         this.name = name;
-        this.imageUrl = imageUrl;
+        this.image = image;
         this.dateAdded = dateAdded;
     }
 
@@ -35,12 +33,12 @@ public class Collection {
         this.name = name;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImage() {
+        return image;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public LocalDate getDateAdded() {
@@ -49,5 +47,9 @@ public class Collection {
 
     public void setDateAdded(LocalDate dateAdded) {
         this.dateAdded = dateAdded;
+    }
+    @Override
+    public String toString() {
+        return "Collection{name='" + name + "'}";
     }
 }

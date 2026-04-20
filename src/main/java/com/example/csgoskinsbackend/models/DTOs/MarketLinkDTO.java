@@ -1,6 +1,7 @@
-package models.DTOs;
+package com.example.csgoskinsbackend.models.DTOs;
 
 public class MarketLinkDTO {
+    private Integer itemId;
     private String wear;
     private Boolean statrak;
     private Boolean souvenir;
@@ -8,11 +9,20 @@ public class MarketLinkDTO {
 
     public MarketLinkDTO() {}
 
-    public MarketLinkDTO(String wear, Boolean statrak, Boolean souvenir, String link) {
+    public MarketLinkDTO(Integer itemId,String wear, Boolean statrak, Boolean souvenir, String link) {
+        this.itemId = itemId;
         this.wear = wear;
         this.statrak = statrak;
         this.souvenir = souvenir;
         this.link = link;
+    }
+
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
     }
 
     public String getWear() {
@@ -45,5 +55,9 @@ public class MarketLinkDTO {
 
     public void setLink(String link) {
         this.link = link;
+    }
+    @Override
+    public String toString() {
+        return "Link{link='" + link + "'}";
     }
 }

@@ -1,9 +1,9 @@
-package models.DTOs;
+package com.example.csgoskinsbackend.models.DTOs;
 
 import java.util.List;
 
 public class WeaponDTO {
-    private String id;
+    private Integer id;
     private String name;
     private String description;
     private String image;
@@ -22,7 +22,24 @@ public class WeaponDTO {
 
     public WeaponDTO() {}
 
-    public WeaponDTO(String id, String name, String description, String image, String weapon, String category, Double minFloat, Double maxFloat, String rarity, Boolean stattrak, Boolean souvenir, String paintIndex, List<String> wears, List<CollectionDTO> collections, List<CrateDTO> crates, List<MarketLinkDTO> links) {
+    public WeaponDTO(String name, String description, String image, String weapon, String category, Double minFloat, Double maxFloat, String rarity, Boolean stattrak, Boolean souvenir, String paintIndex, List<String> wears, List<CollectionDTO> collections, List<CrateDTO> crates, List<MarketLinkDTO> links) {
+        this.name = name;
+        this.description = description;
+        this.image = image;
+        this.weapon = weapon;
+        this.category = category;
+        this.minFloat = minFloat;
+        this.maxFloat = maxFloat;
+        this.rarity = rarity;
+        this.stattrak = stattrak;
+        this.souvenir = souvenir;
+        this.paintIndex = paintIndex;
+        this.wears = wears;
+        this.collections = collections;
+        this.crates = crates;
+        this.links = links;
+    }
+    public WeaponDTO(Integer id, String name, String description, String image, String weapon, String category, Double minFloat, Double maxFloat, String rarity, Boolean stattrak, Boolean souvenir, String paintIndex, List<String> wears, List<CollectionDTO> collections, List<CrateDTO> crates, List<MarketLinkDTO> links) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -41,11 +58,11 @@ public class WeaponDTO {
         this.links = links;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -167,5 +184,27 @@ public class WeaponDTO {
 
     public void setLinks(List<MarketLinkDTO> links) {
         this.links = links;
+    }
+
+    @Override
+    public String toString() {
+        return "WeaponDTO{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", image='" + image + '\'' +
+                ", weapon='" + weapon + '\'' +
+                ", category='" + category + '\'' +
+                ", minFloat=" + minFloat +
+                ", maxFloat=" + maxFloat +
+                ", rarity='" + rarity + '\'' +
+                ", stattrak=" + stattrak +
+                ", souvenir=" + souvenir +
+                ", paintIndex='" + paintIndex + '\'' +
+                ", wears=" + wears.toString() +
+                ", collections=" + collections.toString() +
+                ", crates=" + crates.toString() +
+                ", links=" + links.toString() +
+                '}';
     }
 }

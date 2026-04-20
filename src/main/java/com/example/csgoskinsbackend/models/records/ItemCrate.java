@@ -1,12 +1,12 @@
-package models.records;
+package com.example.csgoskinsbackend.models.records;
 
-public class ItemCollection {
+public class ItemCrate {
     private Integer itemId;
     private Integer collectionId;
 
-    public ItemCollection() {}
+    public ItemCrate() {}
 
-    public ItemCollection(Integer itemId, Integer collectionId) {
+    public ItemCrate(Integer itemId, Integer collectionId) {
         this.itemId = itemId;
         this.collectionId = collectionId;
     }

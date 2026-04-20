@@ -1,8 +1,8 @@
-package models.records;
+package com.example.csgoskinsbackend.models.records;
 
 public class MarketLink {
     private Integer id;
-    private Integer weaponId;
+    private Integer itemId;
     private String wear;
     private Boolean stattrak;
     private Boolean souvenir;
@@ -12,7 +12,7 @@ public class MarketLink {
 
     public MarketLink(Integer id, Integer weaponId, String wear, Boolean stattrak, Boolean souvenir, String link) {
         this.id = id;
-        this.weaponId = weaponId;
+        this.itemId = weaponId;
         this.wear = wear;
         this.stattrak = stattrak;
         this.souvenir = souvenir;
@@ -27,12 +27,12 @@ public class MarketLink {
         this.id = id;
     }
 
-    public Integer getWeaponId() {
-        return weaponId;
+    public Integer getItemId() {
+        return itemId;
     }
 
-    public void setWeaponId(Integer weaponId) {
-        this.weaponId = weaponId;
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
     }
 
     public String getWear() {
