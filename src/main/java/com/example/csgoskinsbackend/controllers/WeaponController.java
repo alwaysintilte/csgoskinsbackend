@@ -1,5 +1,6 @@
 package com.example.csgoskinsbackend.controllers;
 
+import com.example.csgoskinsbackend.models.DTOs.GeneralItemDTO;
 import com.example.csgoskinsbackend.models.DTOs.WeaponDTO;
 import com.example.csgoskinsbackend.services.ItemService;
 import com.example.csgoskinsbackend.services.WeaponService;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("api/weapons")
 public class WeaponController {
@@ -18,11 +20,15 @@ public class WeaponController {
     }
 
     @GetMapping("/all")
-    public List<WeaponDTO> getAllWeapons(){
+    public List<GeneralItemDTO> getAllWeapons(){
         return weaponService.getAllWeapons();
     }
-    @PostMapping("/save")
-    public void saveWeapon(@RequestBody WeaponDTO weaponDTO){
-        weaponService.saveWeapon(weaponDTO);
-    }
+//    @GetMapping("/weapon/{id}")
+//    public GeneralItemDTO getWeaponById(@PathVariable Integer id){
+//        return weaponService.getWeaponById(id);
+//    }
+//    @PostMapping("/add")
+//    public void saveWeapon(@RequestBody WeaponDTO weaponDTO){
+//        weaponService.saveWeapon(weaponDTO);
+//    }
 }

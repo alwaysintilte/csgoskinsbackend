@@ -7,7 +7,6 @@ public class CollectionDTO {
     private String name;
     private String image;
     private LocalDate dateAdded;
-
     public CollectionDTO() {}
 
     public CollectionDTO(Integer id, String name, String image, LocalDate dateAdded) {
@@ -48,6 +47,7 @@ public class CollectionDTO {
     public void setDateAdded(LocalDate dateAdded) {
         this.dateAdded = dateAdded;
     }
+
     @Override
     public String toString() {
         return "Collection{name='" + name + "'}";
