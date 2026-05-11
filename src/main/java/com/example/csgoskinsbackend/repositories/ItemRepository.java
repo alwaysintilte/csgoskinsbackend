@@ -1,6 +1,7 @@
 package com.example.csgoskinsbackend.repositories;
 
 import com.example.csgoskinsbackend.models.DTOs.*;
+import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -246,7 +247,7 @@ public class ItemRepository {
 
     public Map<String, List<Integer>> getAllItemIds() {
         return this.jdbcTemplate.query(
-                "SELECT id, type FROM general_items",
+                "SELECT id, type FROM general_items WHERE type = 'sticker' LIMIT 100",
                 resultSet -> {
                     Map<String, List<Integer>> map = new LinkedHashMap<>();
                     while (resultSet.next()) {
@@ -256,6 +257,25 @@ public class ItemRepository {
                             map.put(type, new ArrayList<>());
                         }
                         map.get(type).add(itemId);
+                    }
+                    return map;
+                }
+        );
+    }
+
+    public Map<Integer, GeneralItemDTO> getItemsByIdAndTable(List<Integer> ids, String typeTable) {
+        if (ids.isEmpty()) {
+            return new HashMap<>();
+        }
+        return this.jdbcTemplate.query(
+                "SELECT general_items.*, " + typeTable + ".* FROM general_items JOIN " + typeTable + " ON general_items.id = " + typeTable + ".id WHERE general_items.id IN (" +
+                        ids.stream().map(id -> String.valueOf(id)).collect(Collectors.joining(", ")) +
+                        ")",
+                resultSet -> {
+                    Map<Integer, GeneralItemDTO> map = new HashMap<>();
+                    while (resultSet.next()) {
+                        GeneralItemDTO dto = mapItemFromResultSet(resultSet, resultSet.getString("type"));
+                        map.put(dto.getId(), dto);
                     }
                     return map;
                 }

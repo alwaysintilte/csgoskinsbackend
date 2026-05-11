@@ -1,4 +1,4 @@
-package com.example.csgoskinsbackend.models.DTOs;
+package com.example.csgoskinsbackend.models.DTOs.marketLinks;
 
 public class MarketLinkWeaponDTO extends MarketLinkDTO {
     private String wear;

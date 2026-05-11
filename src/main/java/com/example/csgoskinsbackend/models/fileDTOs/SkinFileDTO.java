@@ -8,7 +8,6 @@ import tools.jackson.databind.annotation.JsonNaming;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record SkinFileDTO(
         String name,
         String description,

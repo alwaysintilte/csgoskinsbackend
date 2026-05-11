@@ -21,20 +21,20 @@ public class WeaponService {
         this.weaponRepository = weaponRepository;
         this.marketLinkService = marketLinkService;
     }
-    public List<GeneralItemDTO> getAllWeapons(){
-        List<GeneralItemDTO> weapons = weaponRepository.getAllWeapons();
-        List<Integer> ids = weapons.stream().map(weapon -> weapon.getId()).collect(Collectors.toList());
-        Map<Integer, CollectionDTO> collectionMap = itemRepository.getAllCollections(ids);
-        Map<Integer, List<CrateDTO>> crateMap = itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : weapons) {
-            if (item instanceof WeaponDTO weapon) {
-                weapon.setCollection(collectionMap.get(weapon.getId()));
-                weapon.setCrates(crateMap.get(weapon.getId()));
-                weapon.setLinks(marketLinkService.generateMarketLinks(weapon));
-            }
-        }
-        return weapons;
-    }
+//    public List<GeneralItemDTO> getAllWeapons(){
+//        List<GeneralItemDTO> weapons = weaponRepository.getAllWeapons();
+//        List<Integer> ids = weapons.stream().map(weapon -> weapon.getId()).collect(Collectors.toList());
+//        Map<Integer, CollectionDTO> collectionMap = itemRepository.getAllCollections(ids);
+//        Map<Integer, List<CrateDTO>> crateMap = itemRepository.getAllCrates(ids);
+//        for (GeneralItemDTO item : weapons) {
+//            if (item instanceof WeaponDTO weapon) {
+//                weapon.setCollection(collectionMap.get(weapon.getId()));
+//                weapon.setCrates(crateMap.get(weapon.getId()));
+//                weapon.setLinks(marketLinkService.generateMarketLinks(weapon));
+//            }
+//        }
+//        return weapons;
+//    }
 //    public WeaponDTO getWeaponById(Integer id){
 //        WeaponDTO weaponDTO = weaponRepository.getWeaponById(id);
 //        try {

@@ -1,4 +1,8 @@
-package com.example.csgoskinsbackend.models.DTOs;
+package com.example.csgoskinsbackend.models.DTOs.items;
+
+import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
+import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.marketLinks.MarketLinkDTO;
 
 import java.util.List;
 

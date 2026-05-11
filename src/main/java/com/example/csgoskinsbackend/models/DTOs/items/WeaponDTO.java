@@ -1,4 +1,4 @@
-package com.example.csgoskinsbackend.models.DTOs;
+package com.example.csgoskinsbackend.models.DTOs.items;
 
 import java.util.List;
 

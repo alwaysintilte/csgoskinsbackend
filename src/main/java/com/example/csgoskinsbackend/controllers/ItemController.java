@@ -2,7 +2,7 @@ package com.example.csgoskinsbackend.controllers;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
-import com.example.csgoskinsbackend.models.DTOs.GeneralItemDTO;
+import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.example.csgoskinsbackend.services.ItemService;

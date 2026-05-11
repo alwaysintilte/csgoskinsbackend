@@ -1,15 +1,10 @@
 package com.example.csgoskinsbackend.utils;
 
-import com.example.csgoskinsbackend.models.DTOs.WeaponDTO;
-import com.example.csgoskinsbackend.repositories.ImportRepository;
 import com.example.csgoskinsbackend.services.ImportService;
 import com.example.csgoskinsbackend.services.MarketLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Component
 public class DataImportRunner implements CommandLineRunner {
@@ -23,12 +18,20 @@ public class DataImportRunner implements CommandLineRunner {
     }
     @Override
     public void run(String... args) throws Exception {
-        String filePath = "src/main/resources/data/skins.json";
-        //System.out.println("Начинается импорт кейсов...");
-        //importService.importCollections(filePath);
-        //importService.importCrates(filePath);
-        //importService.importSkins(filePath);
-        //System.out.println("Импорт завершен успешно!");
-        System.out.println("Импорт нету");
+//        String filePath = "src/main/resources/data/.json";
+//        System.out.println("Начинается импорт ...");
+//        importService.importCollections(filePath);
+//        importService.importCrates(filePath);
+//        importService.importSkins(filePath);
+//        importService.importStickers(filePath);
+//        importService.importAgents(filePath);
+//        importService.importCollectibles(filePath);
+//        importService.importGraffiti(filePath);
+//        importService.importKeychains(filePath);
+//        importService.importKeys(filePath);
+//        importService.importMusicKits(filePath);
+//        importService.importPatches(filePath);
+//        System.out.println("Импорт завершен успешно!");
+        System.out.println("Импорта нету");
     }
 }

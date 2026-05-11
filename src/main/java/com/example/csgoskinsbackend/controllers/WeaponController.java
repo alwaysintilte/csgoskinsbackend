@@ -1,13 +1,8 @@
 package com.example.csgoskinsbackend.controllers;
 
-import com.example.csgoskinsbackend.models.DTOs.GeneralItemDTO;
-import com.example.csgoskinsbackend.models.DTOs.WeaponDTO;
-import com.example.csgoskinsbackend.services.ItemService;
 import com.example.csgoskinsbackend.services.WeaponService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -19,10 +14,10 @@ public class WeaponController {
         this.weaponService = weaponService;
     }
 
-    @GetMapping("/all")
-    public List<GeneralItemDTO> getAllWeapons(){
-        return weaponService.getAllWeapons();
-    }
+//    @GetMapping("/all")
+//    public List<GeneralItemDTO> getAllWeapons(){
+//        return weaponService.getAllWeapons();
+//    }
 //    @GetMapping("/weapon/{id}")
 //    public GeneralItemDTO getWeaponById(@PathVariable Integer id){
 //        return weaponService.getWeaponById(id);
