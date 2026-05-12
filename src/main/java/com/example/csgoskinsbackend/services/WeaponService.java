@@ -22,29 +22,29 @@ public class WeaponService {
         this.weaponRepository = weaponRepository;
         this.marketLinkService = marketLinkService;
     }
-    public List<GeneralItemDTO> getItemsByWeaponType(String weapon) {
-        List<GeneralItemDTO> items = this.weaponRepository.getItemsByWeaponType(weapon);
-        List<Integer> ids = items.stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+    public PagedResponseDTO getItemsByWeaponType(String weapon, Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.weaponRepository.getItemsByWeaponType(weapon, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
         Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
         Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : items) {
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-        return items;
+        return pagedResponseDTO;
     }
-    public List<GeneralItemDTO> getItemsByCategoryType(String category) {
-        List<GeneralItemDTO> items = this.weaponRepository.getItemsByCategoryType(category);
-        List<Integer> ids = items.stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+    public PagedResponseDTO getItemsByCategoryType(String category, Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.weaponRepository.getItemsByCategoryType(category, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
         Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
         Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : items) {
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-        return items;
+        return pagedResponseDTO;
     }
 //    public List<GeneralItemDTO> getAllWeapons(){
 //        List<GeneralItemDTO> weapons = weaponRepository.getAllWeapons();

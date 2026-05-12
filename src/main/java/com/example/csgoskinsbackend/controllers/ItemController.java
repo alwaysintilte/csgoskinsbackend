@@ -30,7 +30,7 @@ public class ItemController {
 
     @GetMapping("/all")
     public PagedResponseDTO getAllItems(@RequestParam(defaultValue = "0") Integer page){
-        return this.itemService.getAllItems(page);
+        return this.itemService.getAllItems();
     }
 
     @GetMapping("/item/{id}")
@@ -58,10 +58,6 @@ public class ItemController {
         return this.itemService.getCrateById(id);
     }
 
-    @GetMapping("/search/name/{name}")
-    public PagedResponseDTO getItemsByName(@PathVariable String name, @RequestParam(defaultValue = "0") Integer page){
-        return this.itemService.getItemsByName(name, page);
-    }
     @GetMapping("/search/container/type/{type}")
     public PagedResponseDTO getCratesByType(@PathVariable String type, @RequestParam(defaultValue = "0") Integer page) {
         return this.itemService.getCratesByType(type, page);

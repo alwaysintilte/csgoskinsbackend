@@ -18,6 +18,7 @@ import static com.example.csgoskinsbackend.utils.TypeMapper.mapItemFromResultSet
 
 @Repository
 public class ItemRepository {
+    private static final Integer PAGE_SIZE = 50;
     private final JdbcTemplate jdbcTemplate;
     public ItemRepository(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
@@ -174,39 +175,51 @@ public class ItemRepository {
         }, keyHolder);
         return keyHolder.getKey().intValue();
     }
-    public List<GeneralItemDTO> getItemsByCollection(Integer collectionId) {
+    public PagedResponseDTO getItemsByCollection(Integer collectionId, Integer page) {
         String type = this.jdbcTemplate.queryForObject(
                 "SELECT type FROM collections WHERE id = ?",
                 String.class,
                 collectionId
         );
         String typeTable = getTypeTable(type);
-        return this.jdbcTemplate.query(
-                "SELECT general_items.id, general_items.name, general_items.description, general_items.type, general_items.image, general_items.rarity, t.* " +
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query(
+                "SELECT general_items.id, general_items.name, general_items.description, general_items.type, general_items.image, general_items.rarity, t.*, COUNT(*) OVER() as total_count " +
                         "FROM general_items " +
                         "JOIN " + typeTable + " t ON general_items.id = t.id " +
                         "JOIN item_collections ON general_items.id = item_collections.item_id " +
-                        "WHERE item_collections.collection_id = ?",
-                (resultSet, rowNum) -> mapItemFromResultSet(resultSet, type),
-                collectionId
+                        "WHERE item_collections.collection_id = ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, type);
+                },
+                collectionId, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
-    public List<GeneralItemDTO> getItemsByCrate(Integer crateId) {
+    public PagedResponseDTO getItemsByCrate(Integer crateId, Integer page) {
         String type = this.jdbcTemplate.queryForObject(
                 "SELECT type FROM crates WHERE id = ?",
                 String.class,
                 crateId
         );
         String typeTable = getTypeTable(type);
-        return this.jdbcTemplate.query(
-                "SELECT general_items.id, general_items.name, general_items.description, general_items.type, general_items.image, general_items.rarity, t.* " +
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query(
+                "SELECT general_items.id, general_items.name, general_items.description, general_items.type, general_items.image, general_items.rarity, t.*, COUNT(*) OVER() as total_count " +
                         "FROM general_items " +
                         "JOIN " + typeTable + " t ON general_items.id = t.id " +
                         "JOIN item_crates ON general_items.id = item_crates.item_id " +
-                        "WHERE item_crates.crate_id = ?",
-                (resultSet, rowNum) -> mapItemFromResultSet(resultSet, type),
-                crateId
+                        "WHERE item_crates.crate_id = ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, type);
+                },
+                crateId, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
     public void linkCollection(Integer itemId, Integer collectionId) {
         jdbcTemplate.update(
@@ -249,7 +262,7 @@ public class ItemRepository {
                         "        ROW_NUMBER() OVER (PARTITION BY type ORDER BY id) as row_num\n" +
                         "    FROM general_items\n" +
                         ") sub\n" +
-                        "WHERE row_num <= 30;",
+                        "WHERE row_num <= 30 ",
                 resultSet -> {
                     Map<String, List<Integer>> map = new LinkedHashMap<>();
                     while (resultSet.next()) {
@@ -283,39 +296,41 @@ public class ItemRepository {
                 }
         );
     }
-    public List<GeneralItemDTO> getItemsByTable(String typeTable) {
+    public PagedResponseDTO getItemsByTable(String typeTable, Integer page) {
         typeTable = getTypeTable(typeTable);
-        return this.jdbcTemplate.query(
-                "SELECT general_items.*, " + typeTable + ".* FROM general_items JOIN " + typeTable + " ON general_items.id = " + typeTable + ".id",
-                (resultSet, rowNum) -> mapItemFromResultSet(resultSet, resultSet.getString("type"))
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query(
+                "SELECT general_items.*, " + typeTable + ".*, COUNT(*) OVER() as total_count FROM general_items JOIN " + typeTable + " ON general_items.id = " + typeTable + ".id LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, resultSet.getString("type"));
+                }, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
-    public Map<String, List<Integer>> getItemIdsByName(String searchName) {
-        return this.jdbcTemplate.query("SELECT id, type FROM general_items WHERE name ILIKE '%"+searchName+" |%'",
-                resultSet -> {
-                    Map<String, List<Integer>> map = new LinkedHashMap<>();
-                    while (resultSet.next()) {
-                        String type = resultSet.getString("type");
-                        Integer itemId = resultSet.getInt("id");
-                        if (!map.containsKey(type)) {
-                            map.put(type, new ArrayList<>());
-                        }
-                        map.get(type).add(itemId);
-                    }
-                    return map;
-                }
+    public PagedResponseDTO getCollectionsByType(String type, Integer page) {
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT *, COUNT(*) OVER() as total_count FROM collections WHERE type = ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, "collection");
+                },
+                type, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
-    public List<GeneralItemDTO> getCollectionsByType(String type) {
-        return this.jdbcTemplate.query("SELECT * FROM collections WHERE type = ?",
-                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "collection"),
-                type
+    public PagedResponseDTO getCratesByType(String type, Integer page) {
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT *, COUNT(*) OVER() as total_count FROM crates WHERE type = ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, "container");
+                },
+                type, PAGE_SIZE, PAGE_SIZE*page
         );
-    }
-    public List<GeneralItemDTO> getCratesByType(String type) {
-        return this.jdbcTemplate.query("SELECT * FROM crates WHERE type = ?",
-                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "container"),
-                type
-        );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
 }

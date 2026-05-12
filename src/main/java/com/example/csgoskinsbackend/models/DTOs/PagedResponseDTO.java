@@ -10,6 +10,7 @@ public class PagedResponseDTO {
     private Integer totalPages;
     private Integer totalItems;
 
+    public PagedResponseDTO() {}
     public PagedResponseDTO(List<GeneralItemDTO> items, Integer currentPage, Integer totalPages, Integer totalItems) {
         this.items = items;
         this.currentPage = currentPage;

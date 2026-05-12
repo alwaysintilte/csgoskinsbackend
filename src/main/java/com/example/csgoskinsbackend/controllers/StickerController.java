@@ -1,5 +1,6 @@
 package com.example.csgoskinsbackend.controllers;
 
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.services.StickerService;
 import com.example.csgoskinsbackend.services.WeaponService;
@@ -19,7 +20,7 @@ public class StickerController {
     }
 
     @GetMapping("/search/tournament/{tournament}")
-    public List<GeneralItemDTO> getStickersByTournament(@PathVariable String tournament){
-        return stickerService.getStickersByTournament(tournament);
+    public PagedResponseDTO getStickersByTournament(@PathVariable String tournament, @RequestParam(defaultValue = "0") Integer page){
+        return stickerService.getStickersByTournament(tournament, page);
     }
 }

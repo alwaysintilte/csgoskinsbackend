@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.services;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.repositories.ItemRepository;
 import com.example.csgoskinsbackend.repositories.StickerRepository;
@@ -24,16 +25,16 @@ public class StickerService {
         this.stickerRepository = stickerRepository;
         this.marketLinkService = marketLinkService;
     }
-    public List<GeneralItemDTO> getStickersByTournament(String tournament) {
-        List<GeneralItemDTO> items = this.stickerRepository.getStickersByTournament(tournament);
-        List<Integer> ids = items.stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+    public PagedResponseDTO getStickersByTournament(String tournament, Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.stickerRepository.getStickersByTournament(tournament, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
         Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
         Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : items) {
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-        return items;
+        return pagedResponseDTO;
     }
 }

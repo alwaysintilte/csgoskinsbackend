@@ -1,5 +1,6 @@
 package com.example.csgoskinsbackend.controllers;
 
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.services.WeaponService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +19,12 @@ public class WeaponController {
     }
 
     @GetMapping("/search/weapon/{weapon}")
-    public List<GeneralItemDTO> getItemsByWeaponType(@PathVariable String weapon){
-        return weaponService.getItemsByWeaponType(weapon);
+    public PagedResponseDTO getItemsByWeaponType(@PathVariable String weapon, @RequestParam(defaultValue = "0") Integer page){
+        return weaponService.getItemsByWeaponType(weapon, page);
     }
     @GetMapping("/search/category/{category}")
-    public List<GeneralItemDTO> getItemsByCategoryType(@PathVariable String category){
-        return weaponService.getItemsByCategoryType(category);
+    public PagedResponseDTO getItemsByCategoryType(@PathVariable String category, @RequestParam(defaultValue = "0") Integer page){
+        return weaponService.getItemsByCategoryType(category, page);
     }
 //    @GetMapping("/all")
 //    public List<GeneralItemDTO> getAllWeapons(){

@@ -31,7 +31,7 @@ public class ItemService {
         return this.itemRepository.addCrate(crateDTO);
     }
 
-    public List<GeneralItemDTO> getAllItems() {
+    public PagedResponseDTO getAllItems() {
         Map<String, List<Integer>> idsByType = this.itemRepository.getAllItemIds();
         Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
         for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
@@ -49,33 +49,37 @@ public class ItemService {
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-
-        return new ArrayList<>(itemsById.values());
+        PagedResponseDTO pagedResponseDTO = new PagedResponseDTO();
+        pagedResponseDTO.setItems(new ArrayList<>(itemsById.values()));
+        pagedResponseDTO.setCurrentPage(0);
+        pagedResponseDTO.setTotalItems(500);
+        pagedResponseDTO.setTotalPages(10);
+        return pagedResponseDTO;
     }
-    public List<GeneralItemDTO> getItemsByCollection(Integer collectionId) {
-        List<GeneralItemDTO> items = this.itemRepository.getItemsByCollection(collectionId);
-        List<Integer> ids = items.stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+    public PagedResponseDTO getItemsByCollection(Integer collectionId, Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.getItemsByCollection(collectionId, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
         Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
         Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : items) {
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-        return items;
+        return pagedResponseDTO;
     }
 
-    public List<GeneralItemDTO> getItemsByCrate(Integer crateId) {
-        List<GeneralItemDTO> items = this.itemRepository.getItemsByCrate(crateId);
-        List<Integer> ids = items.stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+    public PagedResponseDTO getItemsByCrate(Integer crateId, Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.getItemsByCrate(crateId, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
         Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
         Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
-        for (GeneralItemDTO item : items) {
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
-        return items;
+        return pagedResponseDTO;
     }
 
     public GeneralItemDTO getItemById(Integer id) {
@@ -92,34 +96,13 @@ public class ItemService {
     public CrateDTO getCrateById(Integer id) {
         return this.itemRepository.getCrateById(id);
     }
-
-    public List<GeneralItemDTO> getItemsByName(String searchName) {
-        Map<String, List<Integer>> idsByType = this.itemRepository.getItemIdsByName(searchName);
-        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
-        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
-            String typeTable = getTypeTable(entry.getKey());
-            List<Integer> ids = entry.getValue();
-            if (!ids.isEmpty()) {
-                itemsById.putAll(itemRepository.getItemsByIdAndTable(ids, typeTable));
-            }
-        }
-        List<Integer> allIds = new ArrayList<>(itemsById.keySet());
-        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(allIds);
-        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(allIds);
-        for (GeneralItemDTO item : itemsById.values()) {
-            item.setCollection(collectionMap.get(item.getId()));
-            item.setCrates(crateMap.get(item.getId()));
-            item.setLinks(marketLinkService.generateMarketLinks(item));
-        }
-        return new ArrayList<>(itemsById.values());
+    public PagedResponseDTO getCollectionsByType(String type, Integer page) {
+        return this.itemRepository.getCollectionsByType(type, page);
     }
-    public List<GeneralItemDTO> getCollectionsByType(String type) {
-        return this.itemRepository.getCollectionsByType(type);
+    public PagedResponseDTO getCratesByType(String type, Integer page) {
+        return this.itemRepository.getCratesByType(type, page);
     }
-    public List<GeneralItemDTO> getCratesByType(String type) {
-        return this.itemRepository.getCratesByType(type);
-    }
-    public List<GeneralItemDTO> getItemsByTable(String typeTable) {
-        return this.itemRepository.getItemsByTable(typeTable);
+    public PagedResponseDTO getItemsByTable(String typeTable, Integer page) {
+        return this.itemRepository.getItemsByTable(typeTable, page);
     }
 }

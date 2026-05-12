@@ -1,5 +1,6 @@
 package com.example.csgoskinsbackend.repositories;
 
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.WeaponDTO;
 import com.example.csgoskinsbackend.utils.TypeMapper;
@@ -11,23 +12,38 @@ import java.sql.PreparedStatement;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.csgoskinsbackend.utils.TypeMapper.mapItemFromResultSet;
+
 @Repository
 public class WeaponRepository {
+    private static final Integer PAGE_SIZE = 50;
     private final JdbcTemplate jdbcTemplate;
     public WeaponRepository(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
     }
-    public List<GeneralItemDTO> getItemsByWeaponType(String weapon) {
-        return this.jdbcTemplate.query("SELECT g.*, w.* FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.weapon ILIKE ?",
-                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "weapon"),
-                weapon
+    public PagedResponseDTO getItemsByWeaponType(String weapon, Integer page) {
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT g.*, w.*, COUNT(*) OVER() as total_count FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.weapon ILIKE ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, "weapon");
+                },
+                weapon, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
-    public List<GeneralItemDTO> getItemsByCategoryType(String category) {
-        return this.jdbcTemplate.query("SELECT g.*, w.* FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.category ILIKE ?",
-                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "weapon"),
-                category
+    public PagedResponseDTO getItemsByCategoryType(String category, Integer page) {
+        final int[] totalItems = {0};
+        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT g.*, w.*, COUNT(*) OVER() as total_count FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.category ILIKE ? LIMIT ? OFFSET ?",
+                (resultSet, rowNum) -> {
+                    totalItems[0] = resultSet.getInt("total_count");
+                    return mapItemFromResultSet(resultSet, "weapon");
+                },
+                category, PAGE_SIZE, PAGE_SIZE*page
         );
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(items, page, totalPages, totalItems[0]);
     }
 //    public List<GeneralItemDTO> getAllWeapons(){
 //        List<GeneralItemDTO> weapons = this.jdbcTemplate.query(
