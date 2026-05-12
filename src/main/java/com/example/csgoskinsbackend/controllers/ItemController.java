@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.controllers;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,8 @@ public class ItemController {
     }
 
     @GetMapping("/all")
-    public List<GeneralItemDTO> getAllItems(){
-        return this.itemService.getAllItems();
+    public PagedResponseDTO getAllItems(@RequestParam(defaultValue = "0") Integer page){
+        return this.itemService.getAllItems(page);
     }
 
     @GetMapping("/item/{id}")
@@ -38,8 +39,8 @@ public class ItemController {
     }
 
     @GetMapping("/collection/{collectionId}")
-    public List<GeneralItemDTO> getItemsByCollection(@PathVariable Integer collectionId){
-        return this.itemService.getItemsByCollection(collectionId);
+    public PagedResponseDTO getItemsByCollection(@PathVariable Integer collectionId, @RequestParam(defaultValue = "0") Integer page){
+        return this.itemService.getItemsByCollection(collectionId, page);
     }
 
     @GetMapping("/collection/{id}/info")
@@ -48,8 +49,8 @@ public class ItemController {
     }
 
     @GetMapping("/crate/{crateId}")
-    public List<GeneralItemDTO> getItemsByCrate(@PathVariable Integer crateId){
-        return this.itemService.getItemsByCrate(crateId);
+    public PagedResponseDTO getItemsByCrate(@PathVariable Integer crateId, @RequestParam(defaultValue = "0") Integer page){
+        return this.itemService.getItemsByCrate(crateId, page);
     }
 
     @GetMapping("/crate/{id}/info")
@@ -58,7 +59,19 @@ public class ItemController {
     }
 
     @GetMapping("/search/name/{name}")
-    public List<GeneralItemDTO> getItemsByName(@PathVariable String name){
-        return this.itemService.getItemsByName(name);
+    public PagedResponseDTO getItemsByName(@PathVariable String name, @RequestParam(defaultValue = "0") Integer page){
+        return this.itemService.getItemsByName(name, page);
+    }
+    @GetMapping("/search/container/type/{type}")
+    public PagedResponseDTO getCratesByType(@PathVariable String type, @RequestParam(defaultValue = "0") Integer page) {
+        return this.itemService.getCratesByType(type, page);
+    }
+    @GetMapping("/search/collection/type/{type}")
+    public PagedResponseDTO getCollectionsByType(@PathVariable String type, @RequestParam(defaultValue = "0") Integer page) {
+        return this.itemService.getCollectionsByType(type, page);
+    }
+    @GetMapping("/all/type/{type}")
+    public PagedResponseDTO getItemsByTable(@PathVariable String type, @RequestParam(defaultValue = "0") Integer page) {
+        return this.itemService.getItemsByTable(type, page);
     }
 }

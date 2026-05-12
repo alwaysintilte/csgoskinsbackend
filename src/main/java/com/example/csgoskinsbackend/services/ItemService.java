@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.services;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.repositories.WeaponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,12 @@ import static com.example.csgoskinsbackend.utils.TypeMapper.getTypeTable;
 
 @Service
 public class ItemService {
+    private static final Integer PAGE_SIZE = 50;
     private final ItemRepository itemRepository;
-    private final WeaponRepository weaponRepository;
     private final MarketLinkService marketLinkService;
     @Autowired
-    public ItemService(ItemRepository itemRepository, WeaponRepository weaponRepository, MarketLinkService marketLinkService){
+    public ItemService(ItemRepository itemRepository, MarketLinkService marketLinkService){
         this.itemRepository = itemRepository;
-        this.weaponRepository = weaponRepository;
         this.marketLinkService = marketLinkService;
     }
     public Integer addCollection(CollectionDTO collectionDTO){
@@ -112,5 +112,14 @@ public class ItemService {
             item.setLinks(marketLinkService.generateMarketLinks(item));
         }
         return new ArrayList<>(itemsById.values());
+    }
+    public List<GeneralItemDTO> getCollectionsByType(String type) {
+        return this.itemRepository.getCollectionsByType(type);
+    }
+    public List<GeneralItemDTO> getCratesByType(String type) {
+        return this.itemRepository.getCratesByType(type);
+    }
+    public List<GeneralItemDTO> getItemsByTable(String typeTable) {
+        return this.itemRepository.getItemsByTable(typeTable);
     }
 }

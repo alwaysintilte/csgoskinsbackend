@@ -1,8 +1,10 @@
 package com.example.csgoskinsbackend.models.DTOs;
 
+import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
+
 import java.time.LocalDate;
 
-public class CrateDTO {
+public class CrateDTO extends GeneralItemDTO {
     private Integer id;
     private String name;
     private String image;

@@ -1,5 +1,7 @@
 package com.example.csgoskinsbackend.utils;
 
+import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
+import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.*;
 
 import java.sql.ResultSet;
@@ -18,7 +20,7 @@ public class TypeMapper {
             case "patch" -> "patches";
             case "weapon" -> "weapons";
             case "sticker" -> "stickers";
-            default -> throw new IllegalArgumentException("Unknown type: " + type);
+            default -> type;
         };
         return typeTable;
     }
@@ -33,6 +35,8 @@ public class TypeMapper {
             case "patch" -> mapPatch(resultSet);
             case "weapon" -> mapWeapon(resultSet);
             case "sticker" -> mapSticker(resultSet);
+            case "collection" -> mapCollection(resultSet);
+            case "container" -> mapCrate(resultSet);
             default -> throw new IllegalArgumentException("Unknown type: " + type);
         };
     }
@@ -152,5 +156,23 @@ public class TypeMapper {
         stickerDTO.setTeam(resultSet.getString("team"));
         stickerDTO.setPlayer(resultSet.getString("player"));
         return stickerDTO;
+    }
+    private static CollectionDTO mapCollection(ResultSet resultSet) throws java.sql.SQLException {
+        CollectionDTO collectionDTO = new CollectionDTO();
+        collectionDTO.setId(resultSet.getInt("id"));
+        collectionDTO.setName(resultSet.getString("name"));
+        collectionDTO.setImage(resultSet.getString("image"));
+        collectionDTO.setDateAdded(resultSet.getDate("date_added").toLocalDate());
+        collectionDTO.setType("collection");
+        return collectionDTO;
+    }
+    private static CrateDTO mapCrate(ResultSet resultSet) throws java.sql.SQLException {
+        CrateDTO crateDTO = new CrateDTO();
+        crateDTO.setId(resultSet.getInt("id"));
+        crateDTO.setName(resultSet.getString("name"));
+        crateDTO.setImage(resultSet.getString("image"));
+        crateDTO.setDateAdded(resultSet.getDate("date_added").toLocalDate());
+        crateDTO.setType("container");
+        return crateDTO;
     }
 }

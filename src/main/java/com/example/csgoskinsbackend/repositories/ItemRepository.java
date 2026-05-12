@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.repositories;
 
 import com.example.csgoskinsbackend.models.DTOs.*;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
+import com.example.csgoskinsbackend.utils.TypeMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -238,13 +239,6 @@ public class ItemRepository {
         );
     }
 
-    public Integer getTotalItemsCount() {
-        return this.jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM general_items",
-                Integer.class
-        );
-    }
-
     public Map<String, List<Integer>> getAllItemIds() {
         return this.jdbcTemplate.query(
                 "SELECT id, type\n" +
@@ -289,6 +283,13 @@ public class ItemRepository {
                 }
         );
     }
+    public List<GeneralItemDTO> getItemsByTable(String typeTable) {
+        typeTable = getTypeTable(typeTable);
+        return this.jdbcTemplate.query(
+                "SELECT general_items.*, " + typeTable + ".* FROM general_items JOIN " + typeTable + " ON general_items.id = " + typeTable + ".id",
+                (resultSet, rowNum) -> mapItemFromResultSet(resultSet, resultSet.getString("type"))
+        );
+    }
     public Map<String, List<Integer>> getItemIdsByName(String searchName) {
         return this.jdbcTemplate.query("SELECT id, type FROM general_items WHERE name ILIKE '%"+searchName+" |%'",
                 resultSet -> {
@@ -303,6 +304,18 @@ public class ItemRepository {
                     }
                     return map;
                 }
+        );
+    }
+    public List<GeneralItemDTO> getCollectionsByType(String type) {
+        return this.jdbcTemplate.query("SELECT * FROM collections WHERE type = ?",
+                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "collection"),
+                type
+        );
+    }
+    public List<GeneralItemDTO> getCratesByType(String type) {
+        return this.jdbcTemplate.query("SELECT * FROM crates WHERE type = ?",
+                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "container"),
+                type
         );
     }
 }
