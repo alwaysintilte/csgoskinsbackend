@@ -14,7 +14,7 @@ public class TypeMapper {
             case "graffiti" -> "graffiti";
             case "keychain" -> "keychains";
             case "key" -> "keys";
-            case "music" -> "music_kits";
+            case "music_kit" -> "music_kits";
             case "patch" -> "patches";
             case "weapon" -> "weapons";
             case "sticker" -> "stickers";
@@ -29,7 +29,7 @@ public class TypeMapper {
             case "graffiti" -> mapGraffiti(resultSet);
             case "keychain" -> mapKeychain(resultSet);
             case "key" -> mapKey(resultSet);
-            case "music" -> mapMusicKit(resultSet);
+            case "music_kit" -> mapMusicKit(resultSet);
             case "patch" -> mapPatch(resultSet);
             case "weapon" -> mapWeapon(resultSet);
             case "sticker" -> mapSticker(resultSet);

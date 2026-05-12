@@ -56,4 +56,9 @@ public class ItemController {
     public CrateDTO getCrateById(@PathVariable Integer id) {
         return this.itemService.getCrateById(id);
     }
+
+    @GetMapping("/search/name/{name}")
+    public List<GeneralItemDTO> getItemsByName(@PathVariable String name){
+        return this.itemService.getItemsByName(name);
+    }
 }

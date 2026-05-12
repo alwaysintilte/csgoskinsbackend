@@ -247,7 +247,15 @@ public class ItemRepository {
 
     public Map<String, List<Integer>> getAllItemIds() {
         return this.jdbcTemplate.query(
-                "SELECT id, type FROM general_items WHERE type = 'sticker' LIMIT 100",
+                "SELECT id, type\n" +
+                        "FROM (\n" +
+                        "    SELECT \n" +
+                        "        id, \n" +
+                        "        type,\n" +
+                        "        ROW_NUMBER() OVER (PARTITION BY type ORDER BY id) as row_num\n" +
+                        "    FROM general_items\n" +
+                        ") sub\n" +
+                        "WHERE row_num <= 30;",
                 resultSet -> {
                     Map<String, List<Integer>> map = new LinkedHashMap<>();
                     while (resultSet.next()) {
@@ -276,6 +284,22 @@ public class ItemRepository {
                     while (resultSet.next()) {
                         GeneralItemDTO dto = mapItemFromResultSet(resultSet, resultSet.getString("type"));
                         map.put(dto.getId(), dto);
+                    }
+                    return map;
+                }
+        );
+    }
+    public Map<String, List<Integer>> getItemIdsByName(String searchName) {
+        return this.jdbcTemplate.query("SELECT id, type FROM general_items WHERE name ILIKE '%"+searchName+" |%'",
+                resultSet -> {
+                    Map<String, List<Integer>> map = new LinkedHashMap<>();
+                    while (resultSet.next()) {
+                        String type = resultSet.getString("type");
+                        Integer itemId = resultSet.getInt("id");
+                        if (!map.containsKey(type)) {
+                            map.put(type, new ArrayList<>());
+                        }
+                        map.get(type).add(itemId);
                     }
                     return map;
                 }

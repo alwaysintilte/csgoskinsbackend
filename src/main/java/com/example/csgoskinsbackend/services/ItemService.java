@@ -92,4 +92,25 @@ public class ItemService {
     public CrateDTO getCrateById(Integer id) {
         return this.itemRepository.getCrateById(id);
     }
+
+    public List<GeneralItemDTO> getItemsByName(String searchName) {
+        Map<String, List<Integer>> idsByType = this.itemRepository.getItemIdsByName(searchName);
+        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
+        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
+            String typeTable = getTypeTable(entry.getKey());
+            List<Integer> ids = entry.getValue();
+            if (!ids.isEmpty()) {
+                itemsById.putAll(itemRepository.getItemsByIdAndTable(ids, typeTable));
+            }
+        }
+        List<Integer> allIds = new ArrayList<>(itemsById.keySet());
+        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(allIds);
+        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(allIds);
+        for (GeneralItemDTO item : itemsById.values()) {
+            item.setCollection(collectionMap.get(item.getId()));
+            item.setCrates(crateMap.get(item.getId()));
+            item.setLinks(marketLinkService.generateMarketLinks(item));
+        }
+        return new ArrayList<>(itemsById.values());
+    }
 }

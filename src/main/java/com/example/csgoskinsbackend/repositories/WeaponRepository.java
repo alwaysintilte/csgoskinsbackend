@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.repositories;
 
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.WeaponDTO;
+import com.example.csgoskinsbackend.utils.TypeMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,18 @@ public class WeaponRepository {
     private final JdbcTemplate jdbcTemplate;
     public WeaponRepository(JdbcTemplate jdbcTemplate){
         this.jdbcTemplate = jdbcTemplate;
+    }
+    public List<GeneralItemDTO> getItemsByWeaponType(String weapon) {
+        return this.jdbcTemplate.query("SELECT g.*, w.* FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.weapon ILIKE ?",
+                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "weapon"),
+                weapon
+        );
+    }
+    public List<GeneralItemDTO> getItemsByCategoryType(String category) {
+        return this.jdbcTemplate.query("SELECT g.*, w.* FROM general_items g JOIN weapons w ON g.id = w.id WHERE w.category ILIKE ?",
+                (rs, rowNum) -> TypeMapper.mapItemFromResultSet(rs, "weapon"),
+                category
+        );
     }
 //    public List<GeneralItemDTO> getAllWeapons(){
 //        List<GeneralItemDTO> weapons = this.jdbcTemplate.query(
