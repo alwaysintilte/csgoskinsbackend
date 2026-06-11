@@ -252,20 +252,14 @@ public class ItemRepository {
         );
     }
 
-    public Map<String, List<Integer>> getAllItemIds() {
-        return this.jdbcTemplate.query(
-                "SELECT id, type\n" +
-                        "FROM (\n" +
-                        "    SELECT \n" +
-                        "        id, \n" +
-                        "        type,\n" +
-                        "        ROW_NUMBER() OVER (PARTITION BY type ORDER BY id) as row_num\n" +
-                        "    FROM general_items\n" +
-                        ") sub\n" +
-                        "WHERE row_num <= 30 ",
+    public PagedResponseDTO getAllItems(Integer page) {
+        final int[] totalItems = {0};
+        Map<String, List<Integer>> idsByType = this.jdbcTemplate.query(
+                "SELECT id, type, COUNT(*) OVER() as total_count FROM general_items LIMIT ? OFFSET ?",
                 resultSet -> {
                     Map<String, List<Integer>> map = new LinkedHashMap<>();
                     while (resultSet.next()) {
+                        totalItems[0] = resultSet.getInt("total_count");
                         String type = resultSet.getString("type");
                         Integer itemId = resultSet.getInt("id");
                         if (!map.containsKey(type)) {
@@ -274,10 +268,141 @@ public class ItemRepository {
                         map.get(type).add(itemId);
                     }
                     return map;
-                }
+                },
+                PAGE_SIZE, PAGE_SIZE * page
         );
+        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
+        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
+            String typeTable = getTypeTable(entry.getKey());
+            List<Integer> ids = entry.getValue();
+            if (!ids.isEmpty()) {
+                itemsById.putAll(getItemsByIdAndTable(ids, typeTable));
+            }
+        }
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(new ArrayList<>(itemsById.values()), page, totalPages, totalItems[0]);
     }
+    public PagedResponseDTO searchAllItemsByName(Integer page, String name) {
+        final int[] totalItems = {0};
+        Map<String, List<Integer>> idsByType = this.jdbcTemplate.query(
+                "SELECT id, type, COUNT(*) OVER() as total_count FROM general_items WHERE name ILIKE '%"+name+"%' LIMIT ? OFFSET ?",
+                resultSet -> {
+                    Map<String, List<Integer>> map = new LinkedHashMap<>();
+                    while (resultSet.next()) {
+                        totalItems[0] = resultSet.getInt("total_count");
+                        String type = resultSet.getString("type");
+                        Integer itemId = resultSet.getInt("id");
+                        if (!map.containsKey(type)) {
+                            map.put(type, new ArrayList<>());
+                        }
+                        map.get(type).add(itemId);
+                    }
+                    return map;
+                },
+                PAGE_SIZE, PAGE_SIZE * page
+        );
+        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
+        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
+            String typeTable = getTypeTable(entry.getKey());
+            List<Integer> ids = entry.getValue();
+            if (!ids.isEmpty()) {
+                itemsById.putAll(getItemsByIdAndTable(ids, typeTable));
+            }
+        }
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(new ArrayList<>(itemsById.values()), page, totalPages, totalItems[0]);
+    }
+    public PagedResponseDTO searchAllItemsByFilters(Integer page, ItemSearchFilters itemSearchFilters) {
+        final int[] totalItems = {0};
+        String namePat = itemSearchFilters.getName() != null ? "%" + itemSearchFilters.getName() + "%" : null;
+        String tourPat = itemSearchFilters.getTournament() != null ? "%" + itemSearchFilters.getTournament() + "%" : null;
 
+        Object[] args = {
+                namePat, namePat,
+                itemSearchFilters.getType(), itemSearchFilters.getType(),
+                itemSearchFilters.getRarity(), itemSearchFilters.getRarity(),
+                itemSearchFilters.getWeapon(), itemSearchFilters.getWear(),
+                itemSearchFilters.getMinFloat(), itemSearchFilters.getMaxFloat(),
+                itemSearchFilters.isStatTrak(), itemSearchFilters.isSouvenir(),
+                itemSearchFilters.getWeapon(), itemSearchFilters.getWeapon(),
+                itemSearchFilters.getWear(), itemSearchFilters.getWear(),
+                itemSearchFilters.getMinFloat(), itemSearchFilters.getMinFloat(),
+                itemSearchFilters.getMaxFloat(), itemSearchFilters.getMaxFloat(),
+                itemSearchFilters.isStatTrak(), itemSearchFilters.isStatTrak(),
+                itemSearchFilters.isSouvenir(), itemSearchFilters.isSouvenir(),
+                itemSearchFilters.getStickerType(), tourPat,
+                itemSearchFilters.getStickerType(), itemSearchFilters.getStickerType(),
+                tourPat, tourPat,
+
+                PAGE_SIZE, PAGE_SIZE * page
+        };
+        Map<String, List<Integer>> idsByType = this.jdbcTemplate.query(
+                """
+                    SELECT g.id, g.type, COUNT(*) OVER() as total_count
+                    FROM general_items g
+                    WHERE 1=1
+                    AND (g.name ILIKE ? OR ?::text IS NULL)
+                    AND (g.type = ? OR ?::text IS NULL)
+                    AND (g.rarity = ? OR ?::text IS NULL)
+                    
+                    AND (
+                        (
+                            ?::text IS NULL AND ?::text IS NULL AND ?::double precision IS NULL
+                            AND ?::double precision IS NULL AND ?::boolean IS NULL AND ?::boolean IS NULL
+                        )
+                        OR (
+                            g.type = 'weapon' AND EXISTS (
+                                SELECT 1 FROM weapons w WHERE w.id = g.id
+                                AND (w.weapon = ? OR ?::text IS NULL)
+                                AND (?::text = ANY(w.wears) OR ?::text IS NULL)
+                                AND (w.min_float >= ? OR ?::double precision IS NULL)
+                                AND (w.max_float <= ? OR ?::double precision IS NULL)
+                                AND (w.stattrak = ? OR ?::boolean IS NULL)
+                                AND (w.souvenir = ? OR ?::boolean IS NULL)
+                            )
+                        )
+                    )
+            
+                    AND (
+                        (
+                            ?::text IS NULL AND ?::text IS NULL
+                        )
+                        OR (
+                            g.type = 'sticker' AND EXISTS (
+                                SELECT 1 FROM stickers s WHERE s.id = g.id
+                                AND (s.sticker_type = ? OR ?::text IS NULL)
+                                AND (s.tournament ILIKE ? OR ?::text IS NULL)
+                            )
+                        )
+                    )
+                    LIMIT ? OFFSET ?
+                    """,
+                resultSet -> {
+                    Map<String, List<Integer>> map = new LinkedHashMap<>();
+                    while (resultSet.next()) {
+                        totalItems[0] = resultSet.getInt("total_count");
+                        String type = resultSet.getString("type");
+                        Integer itemId = resultSet.getInt("id");
+                        if (!map.containsKey(type)) {
+                            map.put(type, new ArrayList<>());
+                        }
+                        map.get(type).add(itemId);
+                    }
+                    return map;
+                },
+                args
+        );
+        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
+        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
+            String typeTable = getTypeTable(entry.getKey());
+            List<Integer> ids = entry.getValue();
+            if (!ids.isEmpty()) {
+                itemsById.putAll(getItemsByIdAndTable(ids, typeTable));
+            }
+        }
+        Integer totalPages = (int) Math.ceil((double) totalItems[0] / PAGE_SIZE);
+        return new PagedResponseDTO(new ArrayList<>(itemsById.values()), page, totalPages, totalItems[0]);
+    }
     public Map<Integer, GeneralItemDTO> getItemsByIdAndTable(List<Integer> ids, String typeTable) {
         if (ids.isEmpty()) {
             return new HashMap<>();

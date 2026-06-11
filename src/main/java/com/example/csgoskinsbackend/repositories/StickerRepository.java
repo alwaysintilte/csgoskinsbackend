@@ -24,7 +24,7 @@ public class StickerRepository {
     }
     public PagedResponseDTO getStickersByTournament(String tournament, Integer page) {
         final int[] totalItems = {0};
-        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT g.*, s.*, COUNT(*) OVER() FROM general_items g JOIN stickers s ON g.id = s.id WHERE g.name ILIKE '%"+tournament+"%' LIMIT ? OFFSET ?",
+        List<GeneralItemDTO> items = this.jdbcTemplate.query("SELECT g.*, s.*, COUNT(*) OVER() as total_count FROM general_items g JOIN stickers s ON g.id = s.id WHERE g.name ILIKE '%"+tournament+"%' LIMIT ? OFFSET ?",
                 (resultSet, rowNum) -> {
                     totalItems[0] = resultSet.getInt("total_count");
                     return mapItemFromResultSet(resultSet, "sticker");

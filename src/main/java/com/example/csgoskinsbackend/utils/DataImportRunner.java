@@ -20,6 +20,7 @@ public class DataImportRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //        String filePath = "src/main/resources/data/.json";
 //        System.out.println("Начинается импорт ...");
+//        importService.importPrices(filePath);
 //        importService.importCollections(filePath);
 //        importService.importCrates(filePath);
 //        importService.importSkins(filePath);

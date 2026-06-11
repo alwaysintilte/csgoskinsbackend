@@ -3,6 +3,7 @@ package com.example.csgoskinsbackend.services;
 import com.example.csgoskinsbackend.models.DTOs.*;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.repositories.ItemRepository;
+import com.example.csgoskinsbackend.repositories.StickerRepository;
 import com.example.csgoskinsbackend.repositories.WeaponRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,13 @@ import java.util.stream.Collectors;
 public class WeaponService {
     private final ItemRepository itemRepository;
     private final WeaponRepository weaponRepository;
+    private final PriceService priceService;
     private final MarketLinkService marketLinkService;
     @Autowired
-    public WeaponService(ItemRepository itemRepository, WeaponRepository weaponRepository, MarketLinkService marketLinkService){
+    public WeaponService(ItemRepository itemRepository, WeaponRepository weaponRepository, PriceService priceService, MarketLinkService marketLinkService){
         this.itemRepository = itemRepository;
         this.weaponRepository = weaponRepository;
+        this.priceService = priceService;
         this.marketLinkService = marketLinkService;
     }
     public PagedResponseDTO getItemsByWeaponType(String weapon, Integer page) {
@@ -31,6 +34,7 @@ public class WeaponService {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
         return pagedResponseDTO;
     }
@@ -43,6 +47,7 @@ public class WeaponService {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
         return pagedResponseDTO;
     }

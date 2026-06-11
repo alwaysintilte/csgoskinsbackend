@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.services;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.ItemSearchFilters;
 import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import com.example.csgoskinsbackend.repositories.WeaponRepository;
@@ -18,10 +19,12 @@ import static com.example.csgoskinsbackend.utils.TypeMapper.getTypeTable;
 public class ItemService {
     private static final Integer PAGE_SIZE = 50;
     private final ItemRepository itemRepository;
+    private final PriceService priceService;
     private final MarketLinkService marketLinkService;
     @Autowired
-    public ItemService(ItemRepository itemRepository, MarketLinkService marketLinkService){
+    public ItemService(ItemRepository itemRepository, PriceService priceService, MarketLinkService marketLinkService){
         this.itemRepository = itemRepository;
+        this.priceService = priceService;
         this.marketLinkService = marketLinkService;
     }
     public Integer addCollection(CollectionDTO collectionDTO){
@@ -31,29 +34,43 @@ public class ItemService {
         return this.itemRepository.addCrate(crateDTO);
     }
 
-    public PagedResponseDTO getAllItems() {
-        Map<String, List<Integer>> idsByType = this.itemRepository.getAllItemIds();
-        Map<Integer, GeneralItemDTO> itemsById = new LinkedHashMap<>();
-        for (Map.Entry<String, List<Integer>> entry : idsByType.entrySet()) {
-            String typeTable = getTypeTable(entry.getKey());
-            List<Integer> ids = entry.getValue();
-            if (!ids.isEmpty()) {
-                itemsById.putAll(itemRepository.getItemsByIdAndTable(ids, typeTable));
-            }
-        }
-        List<Integer> allIds = new ArrayList<>(itemsById.keySet());
-        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(allIds);
-        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(allIds);
-        for (GeneralItemDTO item : itemsById.values()) {
+    public PagedResponseDTO getAllItems(Integer page) {
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.getAllItems(page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
+        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
-        PagedResponseDTO pagedResponseDTO = new PagedResponseDTO();
-        pagedResponseDTO.setItems(new ArrayList<>(itemsById.values()));
-        pagedResponseDTO.setCurrentPage(0);
-        pagedResponseDTO.setTotalItems(500);
-        pagedResponseDTO.setTotalPages(10);
+        return pagedResponseDTO;
+    }
+    public PagedResponseDTO searchAllItemsByName(Integer page, String name) {
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.searchAllItemsByName(page, name);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
+        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
+            item.setCollection(collectionMap.get(item.getId()));
+            item.setCrates(crateMap.get(item.getId()));
+            item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
+        }
+        return pagedResponseDTO;
+    }
+    public PagedResponseDTO searchAllItemsByFilters(Integer page, ItemSearchFilters itemSearchFilters) {
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.searchAllItemsByFilters(page, itemSearchFilters);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
+        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
+            item.setCollection(collectionMap.get(item.getId()));
+            item.setCrates(crateMap.get(item.getId()));
+            item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
+        }
         return pagedResponseDTO;
     }
     public PagedResponseDTO getItemsByCollection(Integer collectionId, Integer page) {
@@ -65,6 +82,7 @@ public class ItemService {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
         return pagedResponseDTO;
     }
@@ -78,6 +96,7 @@ public class ItemService {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
         return pagedResponseDTO;
     }
@@ -87,6 +106,7 @@ public class ItemService {
         item.setCollection(itemRepository.getCollection(id));
         item.setCrates(itemRepository.getCrates(id));
         item.setLinks(marketLinkService.generateMarketLinks(item));
+        item.setPrices(this.priceService.generatePrices(item));
         return item;
     }
 
@@ -100,9 +120,23 @@ public class ItemService {
         return this.itemRepository.getCollectionsByType(type, page);
     }
     public PagedResponseDTO getCratesByType(String type, Integer page) {
-        return this.itemRepository.getCratesByType(type, page);
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.getCratesByType(type, page);
+        for (GeneralItemDTO item: pagedResponseDTO.getItems()) {
+            item.setPrices(this.priceService.generatePrices(item));
+        }
+        return pagedResponseDTO;
     }
     public PagedResponseDTO getItemsByTable(String typeTable, Integer page) {
-        return this.itemRepository.getItemsByTable(typeTable, page);
+        PagedResponseDTO pagedResponseDTO = this.itemRepository.getItemsByTable(typeTable, page);
+        List<Integer> ids = pagedResponseDTO.getItems().stream().map(GeneralItemDTO::getId).collect(Collectors.toList());
+        Map<Integer, CollectionDTO> collectionMap = this.itemRepository.getAllCollections(ids);
+        Map<Integer, List<CrateDTO>> crateMap = this.itemRepository.getAllCrates(ids);
+        for (GeneralItemDTO item : pagedResponseDTO.getItems()) {
+            item.setCollection(collectionMap.get(item.getId()));
+            item.setCrates(crateMap.get(item.getId()));
+            item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
+        }
+        return pagedResponseDTO;
     }
 }

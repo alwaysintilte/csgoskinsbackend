@@ -14,6 +14,9 @@ public class ImportService {
         this.importRepository = importRepository;
     }
 
+    public void importPrices(String filePath) throws IOException {
+        this.importRepository.importPrices(filePath);
+    }
     public void importCollections(String filePath) throws IOException {
         this.importRepository.importCollections(filePath);
     }

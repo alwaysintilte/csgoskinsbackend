@@ -3,6 +3,7 @@ package com.example.csgoskinsbackend.models.DTOs.items;
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
 import com.example.csgoskinsbackend.models.DTOs.marketLinks.MarketLinkDTO;
+import com.example.csgoskinsbackend.models.DTOs.prices.PriceDTO;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public abstract class GeneralItemDTO {
     private CollectionDTO collection;
     private List<CrateDTO> crates;
     private List<MarketLinkDTO> links;
+    private List<PriceDTO> prices;
 
     public GeneralItemDTO() {}
 
@@ -98,6 +100,14 @@ public abstract class GeneralItemDTO {
 
     public void setLinks(List<MarketLinkDTO> links) {
         this.links = links;
+    }
+
+    public List<PriceDTO> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(List<PriceDTO> prices) {
+        this.prices = prices;
     }
 
     @Override

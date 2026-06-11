@@ -11,7 +11,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("api/stickers")
+@RequestMapping("/api/stickers")
 public class StickerController {
     private final StickerService stickerService;
     @Autowired

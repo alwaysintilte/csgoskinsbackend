@@ -20,7 +20,7 @@ public class TypeMapper {
             case "patch" -> "patches";
             case "weapon" -> "weapons";
             case "sticker" -> "stickers";
-            default -> type;
+            default -> throw new IllegalArgumentException("Unknown type: " + type);
         };
         return typeTable;
     }

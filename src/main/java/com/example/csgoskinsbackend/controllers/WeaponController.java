@@ -10,7 +10,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("api/weapons")
+@RequestMapping("/api/weapons")
 public class WeaponController {
     private final WeaponService weaponService;
     @Autowired

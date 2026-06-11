@@ -2,26 +2,46 @@ package com.example.csgoskinsbackend.repositories;
 
 import com.example.csgoskinsbackend.models.fileDTOs.*;
 import com.example.csgoskinsbackend.models.fileDTOs.SkinFileDTO.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ImportRepository {
+    private final StringRedisTemplate stringRedisTemplate;
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
 
-    public ImportRepository(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+    public ImportRepository(JdbcTemplate jdbcTemplate, StringRedisTemplate stringRedisTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;
+        this.stringRedisTemplate = stringRedisTemplate;
         this.objectMapper = objectMapper;
+    }
+
+    public void importPrices(String filePath) throws IOException {
+        JsonNode root = objectMapper.readTree(new File(filePath));
+
+        JsonNode pricesNode = root.get("prices");
+        Map<String, String> priceMap = objectMapper.convertValue(
+                pricesNode,
+                new TypeReference<Map<String, String>>() {}
+        );
+
+        if (priceMap != null && !priceMap.isEmpty()) {
+            stringRedisTemplate.opsForHash().putAll("item_prices", priceMap);
+        }
     }
     @Transactional
     public void importCollections(String filePath) throws IOException {

@@ -2,6 +2,7 @@ package com.example.csgoskinsbackend.controllers;
 
 import com.example.csgoskinsbackend.models.DTOs.CollectionDTO;
 import com.example.csgoskinsbackend.models.DTOs.CrateDTO;
+import com.example.csgoskinsbackend.models.DTOs.ItemSearchFilters;
 import com.example.csgoskinsbackend.models.DTOs.PagedResponseDTO;
 import com.example.csgoskinsbackend.models.DTOs.items.GeneralItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("api/items")
+@RequestMapping("/api/items")
 public class ItemController {
     private final ItemService itemService;
     @Autowired
@@ -30,7 +31,15 @@ public class ItemController {
 
     @GetMapping("/all")
     public PagedResponseDTO getAllItems(@RequestParam(defaultValue = "0") Integer page){
-        return this.itemService.getAllItems();
+        return this.itemService.getAllItems(page);
+    }
+    @GetMapping("/search")
+    public PagedResponseDTO searchAllItemsByName(@RequestParam(defaultValue = "0") Integer page, @RequestParam String name){
+        return this.itemService.searchAllItemsByName(page, name);
+    }
+    @GetMapping("/filters")
+    public PagedResponseDTO searchAllItemsByFilters(@RequestParam(defaultValue = "0") Integer page, ItemSearchFilters itemSearchFilters){
+        return this.itemService.searchAllItemsByFilters(page, itemSearchFilters);
     }
 
     @GetMapping("/item/{id}")

@@ -18,11 +18,13 @@ import java.util.stream.Collectors;
 public class StickerService {
     private final ItemRepository itemRepository;
     private final StickerRepository stickerRepository;
+    private final PriceService priceService;
     private final MarketLinkService marketLinkService;
     @Autowired
-    public StickerService(ItemRepository itemRepository, StickerRepository stickerRepository, MarketLinkService marketLinkService){
+    public StickerService(ItemRepository itemRepository, StickerRepository stickerRepository, PriceService priceService, MarketLinkService marketLinkService){
         this.itemRepository = itemRepository;
         this.stickerRepository = stickerRepository;
+        this.priceService = priceService;
         this.marketLinkService = marketLinkService;
     }
     public PagedResponseDTO getStickersByTournament(String tournament, Integer page) {
@@ -34,6 +36,7 @@ public class StickerService {
             item.setCollection(collectionMap.get(item.getId()));
             item.setCrates(crateMap.get(item.getId()));
             item.setLinks(marketLinkService.generateMarketLinks(item));
+            item.setPrices(this.priceService.generatePrices(item));
         }
         return pagedResponseDTO;
     }

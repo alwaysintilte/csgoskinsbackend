@@ -2,12 +2,13 @@ package com.example.csgoskinsbackend.models.DTOs.marketLinks;
 
 public class MarketLinkWeaponDTO extends MarketLinkDTO {
     private String wear;
-    private Boolean statrak;
+    private Boolean stattrak;
     private Boolean souvenir;
 
+    public MarketLinkWeaponDTO() {}
     public MarketLinkWeaponDTO(String wear, Boolean statrak, Boolean souvenir) {
         this.wear = wear;
-        this.statrak = statrak;
+        this.stattrak = statrak;
         this.souvenir = souvenir;
     }
 
@@ -19,12 +20,12 @@ public class MarketLinkWeaponDTO extends MarketLinkDTO {
         this.wear = wear;
     }
 
-    public Boolean getStatrak() {
-        return statrak;
+    public Boolean getStattrak() {
+        return stattrak;
     }
 
-    public void setStatrak(Boolean statrak) {
-        this.statrak = statrak;
+    public void setStattrak(Boolean stattrak) {
+        this.stattrak = stattrak;
     }
 
     public Boolean getSouvenir() {

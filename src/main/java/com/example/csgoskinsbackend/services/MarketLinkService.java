@@ -142,6 +142,23 @@ public class MarketLinkService {
                 result.add(dto);
             }
         }
+        if(weapon.getWears().isEmpty() || weapon.getWears()==null){
+            MarketLinkDTO dto = new MarketLinkWeaponDTO(null, false, false);
+            String fullName = weapon.getName();
+            String encodedLink = encodeUrl(fullName);
+            String finalUrl = BASE_URL + encodedLink;
+            dto.setLink(finalUrl);
+            result.add(dto);
+        }
+        if((weapon.getWears().isEmpty() || weapon.getWears()==null)&&(weapon.getStattrak())){
+            MarketLinkDTO dto = new MarketLinkWeaponDTO(null, true, false);
+            String prefix = "StatTrak™ ";
+            String fullName = prefix + weapon.getName();
+            String encodedLink = encodeUrl(fullName);
+            String finalUrl = BASE_URL + encodedLink;
+            dto.setLink(finalUrl);
+            result.add(dto);
+        }
         return result;
     }
     private List<MarketLinkDTO> generateStickerLinks(StickerDTO stickerDTO) {
